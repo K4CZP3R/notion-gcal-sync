@@ -12,7 +12,7 @@ export interface IBaseRepository<T extends { _id?: string }> {
 }
 
 export class BaseRepository<T extends { _id?: string }> implements IBaseRepository<T> {
-	constructor(private Model = MongoModel) {}
+	constructor(private Model = MongoModel) { }
 
 	getSchemaName(): string {
 		return this.Model.collection.name;
@@ -38,6 +38,12 @@ export class BaseRepository<T extends { _id?: string }> implements IBaseReposito
 	async getAll(): Promise<T[]> {
 		return (await this.Model.find()) as T[];
 	}
+
+	async getOne(): Promise<T> {
+
+		return (await this.Model.findOne()) as T;
+	}
+
 
 	async getWithFilters(
 		filters?: { [key: string]: any },
