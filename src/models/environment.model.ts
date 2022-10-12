@@ -1,6 +1,6 @@
 import { IEnvironment } from "./interfaces/environment.interface";
 import { IDatabaseConfig } from "./interfaces/orm-database-config.interface";
-import { existsSync, read, readFileSync } from "fs";
+import { IGoogleAuthConfig } from "./interfaces/google-auth-config.interface";
 
 export class Environment {
 	constructor(public env: IEnvironment) { }
@@ -15,6 +15,15 @@ export class Environment {
 			url: this.env.DB_URL,
 		};
 	}
+
+	getGoogleAuthConfig(): IGoogleAuthConfig {
+		return {
+			clientId: this.env.GCAL_CLIENT_ID,
+			clientSecret: this.env.GCAL_CLIENT_SECRET,
+			redirectUri: this.env.GCAL_REDIRECT_URI,
+		};
+	}
+
 
 	isDev(): boolean {
 		return this.env.ENVIRONMENT === "dev";
