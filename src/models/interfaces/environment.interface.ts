@@ -11,6 +11,10 @@ export interface IEnvironment {
 	DB_PASS: string;
 	DB_NAME: string;
 	DB_URL: string;
+
+	GCAL_CLIENT_ID: string;
+	GCAL_CLIENT_SECRET: string;
+	GCAL_REDIRECT_URI: string;
 }
 
 /**
@@ -30,4 +34,7 @@ export const IEnvironmentKeys: KeysEnum<IEnvironment> = {
 	DB_PASS: true,
 	DB_NAME: true,
 	DB_URL: true,
+	GCAL_CLIENT_ID: true,
+	GCAL_CLIENT_SECRET: true,
+	GCAL_REDIRECT_URI: true,
 };
