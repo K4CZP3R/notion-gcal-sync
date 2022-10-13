@@ -24,6 +24,10 @@ export class Environment {
 		};
 	}
 
+	getNotionKey(): string {
+		return this.env.NOTION_KEY;
+	}
+
 
 	isDev(): boolean {
 		return this.env.ENVIRONMENT === "dev";
