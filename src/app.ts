@@ -9,11 +9,18 @@ import { createMongooseConnection } from "./services/mongoose-connection.service
 import { configToMongoUrl } from "./helpers/mongo.helper";
 import { Environment } from "./models/environment.model";
 import { getDebug } from "./helpers/debug.helper";
+import { DependencyProviderService } from "./services/dependency-provider.service";
+import { GoogleAuthService } from "./services/google-auth.service";
+import { GOOGLE_AUTH_SERVICE, GOOGLE_CAL_SERVICE } from "./helpers/di-names.helper";
+import { ConfigRepository } from "./repositories/config.repository";
+import { GoogleAuthController } from "./controllers/google-auth.controller";
+import { GoogleCalController } from "./controllers/google-cal.controller";
+import { GoogleCalService } from "./services/google-cal.service";
 
 export class App {
 	public app: express.Express;
 
-	private controllers: IController[] = [];
+	private controllers: IController[] = [new GoogleAuthController(), new GoogleCalController()];
 	debug: debug.Debugger;
 	public appIsReady: boolean;
 
@@ -37,15 +44,24 @@ export class App {
 	}
 
 	private async bootstrapApp(environment: Environment) {
-		this.setupDi(environment);
+		await this.setupDi(environment);
 		if (environment.isDev()) await this.seedDatabaseInDev();
 		this.setupMiddlewares();
 		this.setupControllers();
 		this.setupAfterMiddlewares();
 	}
 
-	private setupDi(env: Environment) {
+	private async setupDi(env: Environment) {
 		createMongooseConnection(configToMongoUrl(env.getDatabase()));
+
+		const googleAuthService = new GoogleAuthService(env.getGoogleAuthConfig());
+		const config = await new ConfigRepository().getConfig();
+		if (config.gcalCredentialsJson) {
+			googleAuthService.authenticateWithTokens(JSON.parse(config.gcalCredentialsJson))
+		}
+
+		DependencyProviderService.setImpl<GoogleAuthService>(GOOGLE_AUTH_SERVICE, googleAuthService);
+		DependencyProviderService.setImpl<GoogleCalService>(GOOGLE_CAL_SERVICE, new GoogleCalService());
 	}
 
 	private setupMiddlewares() {
