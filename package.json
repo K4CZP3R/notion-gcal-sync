@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@googleapis/calendar": "^2.0.0",
+    "@notionhq/client": "^2.2.1",
     "check-password-strength": "^2.0.3",
     "cors": "^2.8.5",
     "debug": "^4.3.2",
