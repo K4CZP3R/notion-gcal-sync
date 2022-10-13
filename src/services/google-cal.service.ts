@@ -3,13 +3,14 @@ import { DependencyProviderService } from "./dependency-provider.service";
 import { GoogleAuthService } from "./google-auth.service";
 
 import { calendar_v3, google } from "googleapis";
-import { GoogleCalendarModel } from "../models/google-calendar.model";
-import { GoogleEventModel } from "../models/google-event.model";
+import { EventModel } from "../models/event.model";
+import { CalendarModel } from "../models/calendar.model";
+import { ICalService } from "../models/interfaces/cal-service.interface";
 
-export class GoogleCalService {
+export class GoogleCalService implements ICalService {
 	googleCalendarApi?: calendar_v3.Calendar;
 
-	constructor() {}
+	constructor() { }
 
 	initializeUsingAuthService() {
 		const authService = DependencyProviderService.getImpl<GoogleAuthService>(GOOGLE_AUTH_SERVICE);
@@ -20,12 +21,12 @@ export class GoogleCalService {
 	async getCalendars(): Promise<any[]> {
 		if (!this.googleCalendarApi) this.initializeUsingAuthService();
 		const calendars = await this.googleCalendarApi!.calendarList.list();
-		return calendars.data.items.map(f => GoogleCalendarModel.fromGoogleCalendar(f)) || [];
+		return calendars.data.items.map(f => CalendarModel.fromGoogleCalendar(f)) || [];
 	}
 
 	async getEvents(calendarId: string): Promise<any[]> {
 		if (!this.googleCalendarApi) this.initializeUsingAuthService();
 		const events = await this.googleCalendarApi!.events.list({ calendarId });
-		return events.data.items.map(e => GoogleEventModel.fromGoogleEvent(e)) || [];
+		return events.data.items.map(e => EventModel.fromGoogleEvent(e)) || [];
 	}
 }
