@@ -11,16 +11,19 @@ import { Environment } from "./models/environment.model";
 import { getDebug } from "./helpers/debug.helper";
 import { DependencyProviderService } from "./services/dependency-provider.service";
 import { GoogleAuthService } from "./services/google-auth.service";
-import { GOOGLE_AUTH_SERVICE, GOOGLE_CAL_SERVICE } from "./helpers/di-names.helper";
+import { GOOGLE_AUTH_SERVICE, GOOGLE_CAL_SERVICE, NOTION_CAL_SERVICE } from "./helpers/di-names.helper";
 import { ConfigRepository } from "./repositories/config.repository";
 import { GoogleAuthController } from "./controllers/google-auth.controller";
-import { GoogleCalController } from "./controllers/google-cal.controller";
 import { GoogleCalService } from "./services/google-cal.service";
+import { GoogleCalController } from "./controllers/google-cal.controller";
+import { NotionCalService } from "./services/notion-cal.service";
+import { NotionCalController } from "./controllers/notion-cal.controller";
+import { ICalService } from "./models/interfaces/cal-service.interface";
 
 export class App {
 	public app: express.Express;
 
-	private controllers: IController[] = [new GoogleAuthController(), new GoogleCalController()];
+	private controllers: IController[];
 	debug: debug.Debugger;
 	public appIsReady: boolean;
 
@@ -61,7 +64,8 @@ export class App {
 		}
 
 		DependencyProviderService.setImpl<GoogleAuthService>(GOOGLE_AUTH_SERVICE, googleAuthService);
-		DependencyProviderService.setImpl<GoogleCalService>(GOOGLE_CAL_SERVICE, new GoogleCalService());
+		DependencyProviderService.setImpl<ICalService>(GOOGLE_CAL_SERVICE, new GoogleCalService());
+		DependencyProviderService.setImpl<ICalService>(NOTION_CAL_SERVICE, new NotionCalService(env.getNotionKey()));
 	}
 
 	private setupMiddlewares() {
@@ -71,6 +75,11 @@ export class App {
 	}
 
 	private setupControllers() {
+		this.controllers = [
+			new GoogleAuthController(),
+			new GoogleCalController(),
+			new NotionCalController()
+		]
 		this.controllers.forEach(controller => {
 			this.app.use(controller.path, controller.router);
 		});

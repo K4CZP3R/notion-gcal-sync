@@ -15,6 +15,8 @@ export interface IEnvironment {
 	GCAL_CLIENT_ID: string;
 	GCAL_CLIENT_SECRET: string;
 	GCAL_REDIRECT_URI: string;
+
+	NOTION_KEY: string;
 }
 
 /**
@@ -37,4 +39,5 @@ export const IEnvironmentKeys: KeysEnum<IEnvironment> = {
 	GCAL_CLIENT_ID: true,
 	GCAL_CLIENT_SECRET: true,
 	GCAL_REDIRECT_URI: true,
+	NOTION_KEY: true
 };
