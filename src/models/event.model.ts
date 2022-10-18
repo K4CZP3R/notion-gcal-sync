@@ -11,7 +11,8 @@ export class EventModel implements IEvent {
         startDateTime: Date,
         endDateTime: Date,
         timeZone: string,
-        addedFrom?: string
+        addedFrom?: string,
+        description?: string
     }
     ) {
 
@@ -26,7 +27,8 @@ export class EventModel implements IEvent {
             creator: notionDatabaseObject.created_by.id,
             startDateTime: new Date(notionDatabaseObject.properties.Date.date.start),
             endDateTime: new Date(notionDatabaseObject.properties.Date.date.end ?? notionDatabaseObject.properties.Date.date.start),
-            timeZone: notionDatabaseObject.properties.Date.date.timezone ?? "Europe/Amsterdam"
+            timeZone: notionDatabaseObject.properties.Date.date.timezone ?? "Europe/Amsterdam",
+            description: notionDatabaseObject.properties.Description.rich_text[0].plain_text
         });
     }
 
@@ -34,15 +36,14 @@ export class EventModel implements IEvent {
 
     static isValidNotionDatabaseObject(notionDatabaseObject: any): boolean {
 
-        console.log(JSON.stringify(notionDatabaseObject, null, 2))
         const basicChecks = notionDatabaseObject.id && notionDatabaseObject.created_time && notionDatabaseObject.last_edited_time;
         const propertyKeys = Object.keys(notionDatabaseObject.properties);
         const nameChecks = propertyKeys.includes("Name") && notionDatabaseObject.properties.Name.title.length > 0 && notionDatabaseObject.properties.Name.title[0].plain_text;
         const dateChecks = propertyKeys.includes("Date") && notionDatabaseObject.properties.Date.date;
-        // const descriptionChecks = propertyKeys.includes("Description") && notionDatabaseObject.properties.Description.rich_text.length > 0 && notionDatabaseObject.properties.Description.rich_text[0].plain_text;
+        const descriptionChecks = propertyKeys.includes("Description") && notionDatabaseObject.properties.Description.rich_text.length > 0 && notionDatabaseObject.properties.Description.rich_text[0].plain_text;
 
 
-        return basicChecks && nameChecks && dateChecks;
+        return basicChecks && nameChecks && dateChecks && descriptionChecks;
     }
 
     static fromGoogleEvent(googleEvent: any): EventModel {
@@ -54,7 +55,8 @@ export class EventModel implements IEvent {
             creator: googleEvent.creator.email,
             startDateTime: new Date(googleEvent.start.dateTime),
             endDateTime: new Date(googleEvent.end.dateTime),
-            timeZone: googleEvent.start.timeZone
+            timeZone: googleEvent.start.timeZone,
+            description: googleEvent.description
         });
 
     }
