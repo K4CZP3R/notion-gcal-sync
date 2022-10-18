@@ -8,5 +8,6 @@ export interface IEvent {
         startDateTime: Date;
         endDateTime: Date;
         timeZone: string;
+        description?: string;
     }
 }
