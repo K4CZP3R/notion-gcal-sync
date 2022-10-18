@@ -12,6 +12,17 @@ export class NotionCalService implements ICalService {
         this.client = new Client({ auth: notionKey })
 
     }
+    async getEvent(calendarId: string, eventId: string): Promise<IEvent> {
+        let object = await this.client.pages.retrieve({
+            page_id: eventId
+        });
+
+        if (EventModel.isValidNotionDatabaseObject(object)) {
+            return EventModel.fromNotionDatabaseObject(object);
+        } else {
+            throw new Error("Notion object is not a valid event");
+        }
+    }
 
     async getEvents(id: string): Promise<IEvent[]> {
         let objects = await this.client.databases.query({
@@ -27,7 +38,6 @@ export class NotionCalService implements ICalService {
                 property: "object",
             }
         })
-
         return databases.results.filter(CalendarModel.isValidNotionDatabase).map(CalendarModel.fromNotionDatabase);
 
     }

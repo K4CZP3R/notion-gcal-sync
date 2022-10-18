@@ -6,11 +6,17 @@ import { calendar_v3, google } from "googleapis";
 import { EventModel } from "../models/event.model";
 import { CalendarModel } from "../models/calendar.model";
 import { ICalService } from "../models/interfaces/cal-service.interface";
+import { IEvent } from "../models/interfaces/event.interface";
 
 export class GoogleCalService implements ICalService {
 	googleCalendarApi?: calendar_v3.Calendar;
 
 	constructor() { }
+	async getEvent(calendarId: string, eventId: string): Promise<IEvent> {
+		if (!this.googleCalendarApi) this.initializeUsingAuthService();
+		const event = await this.googleCalendarApi!.events.get({ calendarId, eventId });
+		return EventModel.fromGoogleEvent(event.data);
+	}
 
 	initializeUsingAuthService() {
 		const authService = DependencyProviderService.getImpl<GoogleAuthService>(GOOGLE_AUTH_SERVICE);
