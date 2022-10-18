@@ -14,11 +14,22 @@ export class BaseCalController extends BaseController {
             path: "/calendar/:calendarId",
             method: "GET",
             func: this.getEventsOfCalendar.bind(this),
+        },
+        {
+            path: "/calendar/:calendarId/:eventId",
+            method: "GET",
+            func: this.getEventOfCalendar.bind(this),
         }
     ];
     constructor(path: string, private calService: ICalService) {
         super({ path });
         this.loadRoutes();
+    }
+
+    async getEventOfCalendar(req: Request, res: Response, next: NextFunction) {
+        const { calendarId, eventId } = req.params;
+        const event = await this.calService.getEvent(calendarId, eventId);
+        res.json(event.data);
     }
 
     async getEventsOfCalendar(req: Request, res: Response, next: NextFunction) {
