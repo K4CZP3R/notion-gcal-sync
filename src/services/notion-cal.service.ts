@@ -12,10 +12,56 @@ export class NotionCalService implements ICalService {
         this.client = new Client({ auth: notionKey })
 
     }
+    async deleteEvent(calendarId: string, eventId: string): Promise<void> {
+        await this.client.pages.update({
+            page_id: eventId,
+            archived: true
+        })
+    }
+    async createEvent(calendarId: string, event: { summary: string, startDateTime: string, endDateTime: string, description: string }): Promise<IEvent> {
+        const object = await this.client.pages.create({
+            parent: {
+                database_id: calendarId
+            },
+            properties: {
+                Name: {
+                    title: [
+                        {
+                            text: {
+                                content: event.summary
+                            }
+                        }]
+
+                },
+                Date: {
+                    date: {
+                        start: event.startDateTime,
+                        end: event.endDateTime
+                    }
+                },
+                Description: {
+                    rich_text: [
+                        {
+                            text: {
+                                content: event.description
+                            }
+                        }
+                    ]
+                }
+
+            },
+
+
+        })
+
+        return this.getEvent(calendarId, object.id);
+    }
     async getEvent(calendarId: string, eventId: string): Promise<IEvent> {
         let object = await this.client.pages.retrieve({
             page_id: eventId
         });
+
+        console.log(JSON.stringify(object, null, 4));
 
         if (EventModel.isValidNotionDatabaseObject(object)) {
             return EventModel.fromNotionDatabaseObject(object);
