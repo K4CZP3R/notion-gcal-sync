@@ -1,7 +1,6 @@
 export interface IEvent {
     data: {
         id: string;
-        status: string;
         created: Date;
         updated: Date;
         summary: string;
